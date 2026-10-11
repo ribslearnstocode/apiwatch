@@ -1,5 +1,10 @@
 name: Publish dashboard to GitHub Pages
 on:
+  push:
+    branches: [main]
+    paths:
+      - frontend/**
+      - .github/workflows/pages.yml
   workflow_dispatch:
 permissions:
   contents: read

@@ -129,7 +129,7 @@ Verified results and environment limits are recorded in [verification.md](docs/v
 
 ## Deployment
 
-See [deployment.md](docs/deployment.md) for Render + Neon and GitHub Pages at `api.ribence.com.np`. `render.yaml`, the Dockerfile and a manual Pages workflow are included. GitHub Pages hosts the frontend only; it needs a separately hosted Python backend and PostgreSQL. A free sleeping web host pauses monitoring while asleep. **No public deployment has been completed.**
+See [deployment.md](docs/deployment.md) for the live Railway + Neon deployment and GitHub Pages dashboard at `api.ribence.com.np`. The Pages workflow publishes on frontend changes and can also be run manually. GitHub Pages hosts the frontend only; it uses the separately hosted Python backend and PostgreSQL. Railway's trial credits are limited, and monitoring pauses if the service is suspended or sleeping. The MVP has no authentication, so do not use it for private monitoring data without adding access protection.
 
 This initial MVP has no user authentication and uses a single shared workspace. A public deployment exposes its management API to visitors; add authentication or protect it with an access gateway before storing private configuration.
 
