@@ -1,0 +1,14 @@
+# Free web service; use an external Neon PostgreSQL database.
+services:
+  - type: web
+    name: apiwatch
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SCHEDULER_ENABLED
+        value: "true"
+      - key: CORS_ORIGINS
+        value: '["https://api.ribence.com.np"]'

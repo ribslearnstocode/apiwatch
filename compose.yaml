@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: apiwatch
+      POSTGRES_PASSWORD: apiwatch
+      POSTGRES_DB: apiwatch
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apiwatch -d apiwatch"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg://apiwatch:apiwatch@db:5432/apiwatch
+      SCHEDULER_ENABLED: "true"
+    ports:
+      - "127.0.0.1:8011:8011"
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  postgres_data:

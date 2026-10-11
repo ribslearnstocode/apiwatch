@@ -1,0 +1,12 @@
+.git
+.venv
+.local-pg
+**/node_modules
+**/dist
+**/.env
+**/__pycache__
+**/.pytest_cache
+**/test-results
+**/*.log
+artifacts
+docs/screenshots

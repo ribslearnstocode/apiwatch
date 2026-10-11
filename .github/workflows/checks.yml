@@ -1,0 +1,51 @@
+name: Verify APIWatch
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: apiwatch
+          POSTGRES_PASSWORD: apiwatch
+          POSTGRES_DB: apiwatch_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U apiwatch -d apiwatch_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: pip install -r backend/requirements.lock.txt
+      - run: python -m pytest -q
+        working-directory: backend
+        env:
+          TEST_DATABASE_URL: postgresql+psycopg://apiwatch:apiwatch@localhost:5432/apiwatch_test
+      - run: npm ci && npm run build
+        working-directory: frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - name: Start seeded backend for browser tests
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+psycopg://apiwatch:apiwatch@localhost:5432/apiwatch_test
+          SCHEDULER_ENABLED: 'false'
+        run: |
+          python -m app.seed
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8011 > /tmp/apiwatch.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --fail http://127.0.0.1:8011/api/health; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/apiwatch.log
+          exit 1
+      - run: npm run test:e2e
+        working-directory: frontend
